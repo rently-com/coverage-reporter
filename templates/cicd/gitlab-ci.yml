@@ -1,0 +1,56 @@
+# GitLab CI Configuration for GitHub Coverage Reporter
+# Place this content in your .gitlab-ci.yml file
+
+stages:
+  - test
+  - coverage
+
+variables:
+  # Node.js version
+  NODE_VERSION: "{{NODE_VERSION}}"
+  # Coverage configuration
+  FILE_NAME: "coverage"
+
+# Test stage
+test:
+  stage: test
+  image: node:$NODE_VERSION
+  script:
+    - npm ci
+    - npm test
+  artifacts:
+    reports:
+      junit: test-results.xml
+    expire_in: 1 hour
+
+# Coverage reporting stage
+coverage-report:
+  stage: coverage
+  image: node:$NODE_VERSION
+  script:
+    - npm ci
+    - npm run test:coverage
+    - npm run coverage-report
+  variables:
+    # GitHub configuration - set these in GitLab CI/CD variables
+    GITHUB_ACCESS_TOKEN: $GITHUB_TOKEN
+    GITHUB_OWNER: "{{GITHUB_OWNER}}"  # Update with your organization
+    GITHUB_REPO: "{{GITHUB_REPO}}"    # Update with your repository name
+    GITHUB_SHA: $CI_COMMIT_SHA
+    GITHUB_PR_NUMBER: $CI_MERGE_REQUEST_IID
+    GITHUB_CURR_BRANCH: $CI_COMMIT_REF_NAME
+    GITHUB_TARGET_BRANCH: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME
+    # Optional S3 configuration - uncomment and set in GitLab CI/CD variables if needed
+    # AWS_S3_BUCKET: $AWS_S3_BUCKET
+    # FOLDER_NAME: "coverage-reports"
+    # AWS_REGION: $AWS_REGION
+    # AWS_ACCESS_KEY_ID: $AWS_ACCESS_KEY_ID
+    # AWS_SECRET_ACCESS_KEY: $AWS_SECRET_ACCESS_KEY
+  only:
+    - merge_requests
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    expire_in: 1 week

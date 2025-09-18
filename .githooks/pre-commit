@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+# GitHub Coverage Reporter pre-commit hook
+
+# Run secretlint to check for secrets
+echo "🔍 Checking for secrets..."
+npm run lint:secrets
+
+if [ $? -ne 0 ]; then
+  echo "❌ Secretlint found potential secrets. Please review and fix before committing."
+  exit 1
+fi
+
+echo "✅ No secrets detected."
+exit 0

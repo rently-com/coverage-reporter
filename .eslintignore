@@ -1,0 +1,12 @@
+# Ignore template files as they contain placeholder variables
+templates/
+
+# Ignore generated test environments
+test-environments/
+
+# Ignore coverage output
+coverage/
+.nyc_output/
+
+# Ignore node modules
+node_modules/

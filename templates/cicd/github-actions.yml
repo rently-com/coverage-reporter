@@ -1,0 +1,54 @@
+name: Coverage Report
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+      - develop
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+jobs:
+  coverage-report:
+    name: Generate Coverage Report
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '{{NODE_VERSION}}'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Lint code (ESLint + Secretlint)
+        run: npm run lint:all
+        
+      - name: Run tests with coverage
+        run: npm run test:coverage
+        
+      - name: Generate Coverage Report
+        run: npm run coverage-report
+        env:
+          # GitHub environment variables - automatically provided by CI
+          GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_CURR_BRANCH: ${{ github.head_ref || github.ref_name }}
+          GITHUB_TARGET_BRANCH: ${{ github.base_ref || 'main' }}
+          # Add any additional environment variables your project needs:
+          # AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          # FOLDER_NAME: ${{ secrets.FOLDER_NAME }}
+          # AWS_REGION: ${{ secrets.AWS_REGION }}
+          # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          # FILE_NAME: coverage

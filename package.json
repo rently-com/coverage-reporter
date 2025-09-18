@@ -1,0 +1,62 @@
+{
+  "name": "@rently-com/github-coverage-reporter",
+  "version": "1.0.0",
+  "description": "A GitHub coverage reporting tool that posts coverage status checks and PR comments",
+  "main": "index.js",
+  "bin": {
+    "github-coverage-reporter": "./bin/cli-run.js",
+    "github-coverage-init": "./bin/simple-init.js"
+  },
+  "scripts": {
+    "test": "mocha 'test/**/*.test.js'",
+    "test:coverage": "nyc mocha 'test/**/*.test.js'",
+    "test:local": "node test-environments/local-test.js",
+    "test:automated": "node test-environments/automated-test.js",
+    "test:quick": "node test-environments/quick-test.js",
+    "test:clean": "rm -rf test-environments/sample-project-* test-environments/automated-test-* test-environments/quick-test-*",
+    "lint": "eslint .",
+    "lint:secrets": "secretlint .",
+    "lint:all": "npm run lint && npm run lint:secrets",
+    "prepare": "npm run lint:all",
+    "init": "node ./bin/simple-init.js",
+    "postinstall": "git config core.hooksPath .githooks || true"
+  },
+  "keywords": [
+    "github",
+    "coverage",
+    "reporter",
+    "ci",
+    "pull-request",
+    "status-checks"
+  ],
+  "author": "Rently <tech@rently.com>",
+  "license": "MIT",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.0.0",
+    "axios": "^1.0.0",
+    "dotenv": "^16.0.0",
+    "inquirer": "^8.2.7"
+  },
+  "devDependencies": {
+    "@secretlint/secretlint-rule-aws": "^11.2.4",
+    "@secretlint/secretlint-rule-gcp": "^11.2.4",
+    "@secretlint/secretlint-rule-preset-recommend": "^11.2.4",
+    "chai": "^4.3.0",
+    "eslint": "^8.0.0",
+    "mocha": "^10.0.0",
+    "nyc": "^15.1.0",
+    "secretlint": "^11.2.4",
+    "sinon": "^15.0.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rently-com/rently-billing.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rently-com/rently-billing/issues"
+  },
+  "homepage": "https://github.com/rently-com/rently-billing#readme"
+}
