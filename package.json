@@ -10,10 +10,6 @@
   "scripts": {
     "test": "mocha 'test/**/*.test.js'",
     "test:coverage": "nyc mocha 'test/**/*.test.js'",
-    "test:local": "node test-environments/local-test.js",
-    "test:automated": "node test-environments/automated-test.js",
-    "test:quick": "node test-environments/quick-test.js",
-    "test:clean": "rm -rf test-environments/sample-project-* test-environments/automated-test-* test-environments/quick-test-*",
     "lint": "eslint .",
     "lint:secrets": "secretlint .",
     "lint:all": "npm run lint && npm run lint:secrets",
