@@ -69,7 +69,7 @@ async function main() {
 
     console.log('\n✅ GitHub Coverage Reporter initialized successfully!');
     console.log('\nNext steps:');
-    
+
     if (answers.configType === 'json') {
       console.log('1. Review the .gcr.json configuration file');
       console.log('2. Set up your GitHub credentials as environment variables');
@@ -79,8 +79,8 @@ async function main() {
       console.log('1. Review the .gcr.json configuration file');
       console.log('2. Fill in your GitHub credentials in the .env.github-coverage file');
     }
-    
-  console.log('3. Run the coverage reporter with: npm run coverage-report');
+
+    console.log('3. Run the coverage reporter with: npm run coverage-report');
 
     // ESLint ignore automation for coverage-report.js
     const eslintIgnorePath = path.join(process.cwd(), '.eslintignore');
@@ -105,6 +105,108 @@ async function main() {
     } else {
       console.log('ℹ️ .eslintignore already excludes scripts/coverage-report.js');
     }
+
+    // NYC ignore automation for coverage-report.js
+    const nycConfigPaths = [
+      path.join(process.cwd(), '.nycrc.json'),
+      path.join(process.cwd(), '.nycrc'),
+      path.join(process.cwd(), 'nyc.config.js'),
+      path.join(process.cwd(), 'package.json') // Check package.json for nyc config
+    ];
+
+    let nycIgnoreUpdated = false;
+
+    // Find existing nyc config file
+    let nycConfigPath = null;
+    let nycConfig = null;
+    let isPackageJsonNyc = false;
+    let packageJsonData = null;
+
+    for (const configPath of nycConfigPaths) {
+      if (fs.existsSync(configPath)) {
+        nycConfigPath = configPath;
+        try {
+          if (configPath.endsWith('package.json')) {
+            packageJsonData = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+            if (packageJsonData.nyc) {
+              nycConfig = packageJsonData.nyc;
+              isPackageJsonNyc = true;
+            }
+          } else if (configPath.endsWith('.json')) {
+            nycConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+          }
+          // For .nycrc without extension, try to parse as JSON
+          else if (configPath.endsWith('.nycrc')) {
+            const content = fs.readFileSync(configPath, 'utf8').trim();
+            if (content.startsWith('{')) {
+              nycConfig = JSON.parse(content);
+            }
+          }
+          // Skip .js config files as they're more complex to modify
+        } catch (error) {
+          console.warn(`⚠️ Could not parse ${configPath}, skipping nyc config update`);
+          continue;
+        }
+        break;
+      }
+    }
+
+    if (nycConfig && nycConfigPath && !nycConfigPath.endsWith('.js')) {
+      // Ensure exclude array exists
+      if (!nycConfig.exclude) {
+        nycConfig.exclude = [];
+      }
+
+      // Check if scripts/** is already in exclude list
+      const scriptsPattern = 'scripts/**';
+      if (!nycConfig.exclude.includes(scriptsPattern) && !nycConfig.exclude.includes('scripts/coverage-report.js')) {
+        nycConfig.exclude.push(scriptsPattern);
+
+        // Write updated config back to file
+        try {
+          if (isPackageJsonNyc && packageJsonData) {
+            // Update the nyc section in package.json
+            packageJsonData.nyc = nycConfig;
+            const updatedContent = JSON.stringify(packageJsonData, null, 2);
+            fs.writeFileSync(nycConfigPath, updatedContent);
+          } else {
+            // Update standalone nyc config file
+            const updatedContent = JSON.stringify(nycConfig, null, 2);
+            fs.writeFileSync(nycConfigPath, updatedContent);
+          }
+          nycIgnoreUpdated = true;
+        } catch (error) {
+          console.warn(`⚠️ Could not update ${nycConfigPath}:`, error.message);
+        }
+      }
+    } else if (!nycConfigPath) {
+      // Create a basic .nycrc.json if no nyc config exists
+      const basicNycConfig = {
+        exclude: [
+          'test/**',
+          'coverage/**',
+          'node_modules/**',
+          'scripts/**'
+        ],
+        reporter: ['text', 'text-summary', 'lcov', 'json-summary'],
+        'report-dir': 'coverage'
+      };
+
+      try {
+        const newNycConfigPath = path.join(process.cwd(), '.nycrc.json');
+        fs.writeFileSync(newNycConfigPath, JSON.stringify(basicNycConfig, null, 2));
+        console.log('✅ Created .nycrc.json with scripts/** exclusion');
+        nycIgnoreUpdated = true;
+      } catch (error) {
+        console.warn('⚠️ Could not create .nycrc.json:', error.message);
+      }
+    }
+
+    if (nycIgnoreUpdated) {
+      console.log('✅ Updated nyc configuration to exclude scripts/**');
+    } else {
+      console.log('ℹ️ nyc configuration already excludes scripts or could not be updated');
+    }
   } catch (error) {
     console.error('❌ Error during initialization:', error.message);
     process.exit(1);
@@ -116,18 +218,18 @@ async function main() {
  */
 async function createJsonConfig() {
   console.log('\n📝 Creating JSON configuration file...');
-  
+
   try {
     const configPath = path.join(process.cwd(), '.gcr.json');
     let existingConfig = null;
     let updateChoice = { action: 'fresh' }; // Default action
-    
+
     // Check if config file already exists
     if (fs.existsSync(configPath)) {
       try {
         existingConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
         console.log('📋 Found existing .gcr.json configuration');
-        
+
         updateChoice = await inquirer.prompt([
           {
             type: 'list',
@@ -141,7 +243,7 @@ async function createJsonConfig() {
             default: 'update'
           }
         ]);
-        
+
         if (updateChoice.action === 'fresh') {
           existingConfig = null;
         }
@@ -150,33 +252,33 @@ async function createJsonConfig() {
         existingConfig = null;
       }
     }
-    
+
     // Ask for coverage types
     const types = [];
-    
+
     // If updating and we have existing types, use them as starting point
-    if (existingConfig && existingConfig.coverage && existingConfig.coverage.types && 
-        existingConfig.coverage.types.length > 0) {
-      
+    if (existingConfig && existingConfig.coverage && existingConfig.coverage.types &&
+      existingConfig.coverage.types.length > 0) {
+
       if (updateChoice.action === 'append') {
         // Add existing types to our array
         types.push(...existingConfig.coverage.types);
         console.log(`\n📊 Existing coverage types loaded: ${types.map(t => t.name).join(', ')}`);
       }
     }
-    
+
     console.log('\nLet\'s configure your coverage types:');
-    
+
     // Use a do-while loop to ensure at least one iteration (unless we're just appending)
     let continueAdding = true;
-    
+
     // Skip initial prompts if we're just updating with existing types
-    if (updateChoice && updateChoice.action === 'update' && types.length === 0 && 
-        existingConfig && existingConfig.coverage && existingConfig.coverage.types) {
+    if (updateChoice && updateChoice.action === 'update' && types.length === 0 &&
+      existingConfig && existingConfig.coverage && existingConfig.coverage.types) {
       // Load existing types for update
       types.push(...existingConfig.coverage.types);
       console.log(`\n📊 Loaded ${types.length} existing coverage types`);
-      
+
       // Ask if they want to add more types
       const addMorePrompt = await inquirer.prompt([
         {
@@ -186,15 +288,15 @@ async function createJsonConfig() {
           default: false
         }
       ]);
-      
+
       continueAdding = addMorePrompt.addMore;
     }
-    
+
     // Only prompt for new types if we need to
     if (types.length === 0 || continueAdding) {
       do {
         console.log(`\n📊 Coverage Type ${types.length + 1}:`);
-        
+
         const typeAnswers = await inquirer.prompt([
           {
             type: 'input',
@@ -224,21 +326,21 @@ async function createJsonConfig() {
             default: 80,
             validate: input => {
               const num = parseInt(input);
-              return (!isNaN(num) && num >= 0 && num <= 100) ? 
+              return (!isNaN(num) && num >= 0 && num <= 100) ?
                 true : 'Please enter a number between 0 and 100';
             }
           }
         ]);
-        
+
         // Add the type to our array
         types.push({
           name: typeAnswers.name.trim(),
           filePath: typeAnswers.path.trim(),
           threshold: parseInt(typeAnswers.threshold)
         });
-        
+
         console.log(`✅ Added coverage type: ${typeAnswers.name}`);
-        
+
         // Ask if they want to add another
         const continuePrompt = await inquirer.prompt([
           {
@@ -248,17 +350,17 @@ async function createJsonConfig() {
             default: false
           }
         ]);
-        
+
         continueAdding = continuePrompt.addAnother;
-        
+
       } while (continueAdding);
     }
-    
+
     console.log(`\n✅ Configuration complete! ${types.length} coverage type${types.length > 1 ? 's' : ''} configured:`);
     types.forEach((type, index) => {
       console.log(`  ${index + 1}. ${type.name} (${type.threshold}% threshold)`);
     });
-    
+
     // If no types added, add a default
     if (types.length === 0) {
       types.push({
@@ -267,7 +369,7 @@ async function createJsonConfig() {
         threshold: 80
       });
     }
-    
+
     // Get general settings and S3 options with existing values as defaults
     const settingsAnswers = await inquirer.prompt([
       {
@@ -280,7 +382,7 @@ async function createJsonConfig() {
           if (existingConfig && existingConfig.config && existingConfig.config.github && existingConfig.config.github.owner) {
             return existingConfig.config.github.owner;
           }
-          
+
           // Try to extract from package.json if available
           try {
             const packageJsonPath = path.join(process.cwd(), 'package.json');
@@ -310,7 +412,7 @@ async function createJsonConfig() {
           if (existingConfig && existingConfig.config && existingConfig.config.github && existingConfig.config.github.repo) {
             return existingConfig.config.github.repo;
           }
-          
+
           // Try to extract from package.json if available
           try {
             const packageJsonPath = path.join(process.cwd(), 'package.json');
@@ -338,8 +440,8 @@ async function createJsonConfig() {
         type: 'input',
         name: 'defaultTargetBranch',
         message: 'Default target branch for coverage comparison:',
-        default: (existingConfig && existingConfig.config && existingConfig.config.github && existingConfig.config.github.defaultTargetBranch) 
-          ? existingConfig.config.github.defaultTargetBranch 
+        default: (existingConfig && existingConfig.config && existingConfig.config.github && existingConfig.config.github.defaultTargetBranch)
+          ? existingConfig.config.github.defaultTargetBranch
           : 'main',
         validate: input => input.trim() ? true : 'Default target branch is required'
       },
@@ -347,8 +449,8 @@ async function createJsonConfig() {
         type: 'input',
         name: 'maxDiff',
         message: 'Maximum allowed coverage decrease percentage:',
-        default: (existingConfig && existingConfig.coverage && existingConfig.coverage.maxDiff) 
-          ? existingConfig.coverage.maxDiff 
+        default: (existingConfig && existingConfig.coverage && existingConfig.coverage.maxDiff)
+          ? existingConfig.coverage.maxDiff
           : 5,
         validate: input => {
           const num = parseInt(input);
@@ -359,24 +461,24 @@ async function createJsonConfig() {
         type: 'confirm',
         name: 'enableStatusChecks',
         message: 'Enable GitHub status checks?',
-        default: (existingConfig && existingConfig.statusCheck && typeof existingConfig.statusCheck.enabled === 'boolean') 
-          ? existingConfig.statusCheck.enabled 
+        default: (existingConfig && existingConfig.statusCheck && typeof existingConfig.statusCheck.enabled === 'boolean')
+          ? existingConfig.statusCheck.enabled
           : true
       },
       {
         type: 'confirm',
         name: 'enableComments',
         message: 'Enable PR comments with coverage information?',
-        default: (existingConfig && existingConfig.comment && typeof existingConfig.comment.enabled === 'boolean') 
-          ? existingConfig.comment.enabled 
+        default: (existingConfig && existingConfig.comment && typeof existingConfig.comment.enabled === 'boolean')
+          ? existingConfig.comment.enabled
           : true
       },
       {
         type: 'input',
         name: 's3FileName',
         message: 'S3 file name for coverage history (e.g., coverage-history.json):',
-        default: (existingConfig && existingConfig.config && existingConfig.config.s3 && existingConfig.config.s3.fileName) 
-          ? existingConfig.config.s3.fileName 
+        default: (existingConfig && existingConfig.config && existingConfig.config.s3 && existingConfig.config.s3.fileName)
+          ? existingConfig.config.s3.fileName
           : 'coverage-history.json',
         validate: input => input.trim() ? true : 'File name is required'
       },
@@ -384,8 +486,8 @@ async function createJsonConfig() {
         type: 'input',
         name: 's3FolderName',
         message: 'S3 folder name (e.g., coverage-reports):',
-        default: (existingConfig && existingConfig.config && existingConfig.config.s3 && existingConfig.config.s3.folderName) 
-          ? existingConfig.config.s3.folderName 
+        default: (existingConfig && existingConfig.config && existingConfig.config.s3 && existingConfig.config.s3.folderName)
+          ? existingConfig.config.s3.folderName
           : 'coverage-reports',
         validate: input => input.trim() ? true : 'Folder name is required'
       }
@@ -410,24 +512,24 @@ async function createJsonConfig() {
       },
       statusCheck: {
         enabled: settingsAnswers.enableStatusChecks,
-        context: existingConfig && existingConfig.statusCheck && existingConfig.statusCheck.context 
-          ? existingConfig.statusCheck.context 
+        context: existingConfig && existingConfig.statusCheck && existingConfig.statusCheck.context
+          ? existingConfig.statusCheck.context
           : 'Coverage Report'
       },
       comment: {
         enabled: settingsAnswers.enableComments,
-        header: existingConfig && existingConfig.comment && existingConfig.comment.header 
-          ? existingConfig.comment.header 
+        header: existingConfig && existingConfig.comment && existingConfig.comment.header
+          ? existingConfig.comment.header
           : '# Coverage Report',
-        footer: existingConfig && existingConfig.comment && existingConfig.comment.footer 
-          ? existingConfig.comment.footer 
+        footer: existingConfig && existingConfig.comment && existingConfig.comment.footer
+          ? existingConfig.comment.footer
           : '## Coverage is enforced by GitHub Status Check'
       }
     };
-    
+
     // Write config file
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-    
+
     console.log(`✅ Created configuration file: ${configPath}`);
     return config;
   } catch (error) {
@@ -441,17 +543,17 @@ async function createJsonConfig() {
  */
 function createEnvFile(minimal = false, coverageTypes = [], templateProcessor) {
   console.log('\n📝 Creating environment variables file...');
-  
+
   const envPath = path.join(process.cwd(), '.env.github-coverage');
-  
+
   // Skip if file already exists
   if (fs.existsSync(envPath)) {
     console.log('ℹ️ .env.github-coverage already exists, skipping...');
     return;
   }
-  
+
   const content = templateProcessor.generateEnvFile(minimal, coverageTypes);
-  
+
   fs.writeFileSync(envPath, content);
   console.log(`✅ Created environment file: ${envPath}`);
 }
@@ -461,19 +563,19 @@ function createEnvFile(minimal = false, coverageTypes = [], templateProcessor) {
  */
 async function createGitHubWorkflow(templateProcessor, nodeVersion = '16') {
   console.log('\n📝 Setting up GitHub Actions workflow...');
-  
+
   const workflowDir = path.join(process.cwd(), '.github', 'workflows');
   const workflowPath = path.join(workflowDir, 'coverage-report.yml');
-  
+
   // Create directory if it doesn't exist
   if (!fs.existsSync(workflowDir)) {
     fs.mkdirSync(workflowDir, { recursive: true });
   }
-  
+
   // Handle existing file
   if (fs.existsSync(workflowPath)) {
     console.log('⚠️ GitHub workflow file already exists at:', workflowPath);
-    
+
     const choice = await inquirer.prompt([
       {
         type: 'list',
@@ -487,7 +589,7 @@ async function createGitHubWorkflow(templateProcessor, nodeVersion = '16') {
         default: 'rename'
       }
     ]);
-    
+
     if (choice.action === 'skip') {
       console.log('ℹ️ Skipping GitHub workflow creation');
       return;
@@ -513,7 +615,7 @@ async function createGitHubWorkflow(templateProcessor, nodeVersion = '16') {
       }
     }
   }
-  
+
   const content = templateProcessor.generateGitHubWorkflow(nodeVersion);
   fs.writeFileSync(workflowPath, content);
   console.log(`✅ Created GitHub workflow file: ${workflowPath}`);
@@ -524,13 +626,13 @@ async function createGitHubWorkflow(templateProcessor, nodeVersion = '16') {
  */
 async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
   console.log('\n📝 Setting up Jenkinsfile...');
-  
+
   const jenkinsfilePath = path.join(process.cwd(), 'Jenkinsfile');
-  
+
   // Handle existing file
   if (fs.existsSync(jenkinsfilePath)) {
     console.log('⚠️ Jenkinsfile already exists at:', jenkinsfilePath);
-    
+
     const choice = await inquirer.prompt([
       {
         type: 'list',
@@ -544,7 +646,7 @@ async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
         default: 'rename'
       }
     ]);
-    
+
     if (choice.action === 'skip') {
       console.log('ℹ️ Skipping Jenkinsfile creation');
       return;
@@ -558,11 +660,11 @@ async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
         const timestamp = Date.now();
         const timestampedPath = path.join(process.cwd(), `Jenkinsfile.coverage-${timestamp}`);
         console.log(`📝 Creating Jenkinsfile: ${timestampedPath}`);
-        
+
         // Try to get repo info from package.json or use defaults
         let githubOwner = 'your-org';
         let githubRepo = 'your-repo';
-        
+
         try {
           const packageJsonPath = path.join(process.cwd(), 'package.json');
           if (fs.existsSync(packageJsonPath)) {
@@ -579,7 +681,7 @@ async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
         } catch (error) {
           // Use defaults if we can't parse package.json
         }
-        
+
         const content = templateProcessor.generateJenkinsfile(nodeVersion, githubOwner, githubRepo);
         fs.writeFileSync(timestampedPath, content);
         console.log(`✅ Created Jenkinsfile: ${timestampedPath}`);
@@ -588,7 +690,7 @@ async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
         // Try to get repo info from package.json or use defaults
         let githubOwner = 'your-org';
         let githubRepo = 'your-repo';
-        
+
         try {
           const packageJsonPath = path.join(process.cwd(), 'package.json');
           if (fs.existsSync(packageJsonPath)) {
@@ -605,7 +707,7 @@ async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
         } catch (error) {
           // Use defaults if we can't parse package.json
         }
-        
+
         const content = templateProcessor.generateJenkinsfile(nodeVersion, githubOwner, githubRepo);
         fs.writeFileSync(newJenkinsfilePath, content);
         console.log(`✅ Created Jenkinsfile: ${newJenkinsfilePath}`);
@@ -613,11 +715,11 @@ async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
       }
     }
   }
-  
+
   // Try to get repo info from package.json or use defaults
   let githubOwner = 'your-org';
   let githubRepo = 'your-repo';
-  
+
   try {
     const packageJsonPath = path.join(process.cwd(), 'package.json');
     if (fs.existsSync(packageJsonPath)) {
@@ -634,9 +736,9 @@ async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
   } catch (error) {
     // Use defaults if we can't parse package.json
   }
-  
+
   const content = templateProcessor.generateJenkinsfile(nodeVersion, githubOwner, githubRepo);
-  
+
   fs.writeFileSync(jenkinsfilePath, content);
   console.log(`✅ Created Jenkinsfile: ${jenkinsfilePath}`);
 }
@@ -646,19 +748,19 @@ async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
  */
 async function createHelperScript(useConfigFile = false, config = null, templateProcessor) {
   console.log('\n📝 Creating helper script...');
-  
+
   const scriptsDir = path.join(process.cwd(), 'scripts');
   const scriptPath = path.join(scriptsDir, 'coverage-report.js');
-  
+
   // Create directory if it doesn't exist
   if (!fs.existsSync(scriptsDir)) {
     fs.mkdirSync(scriptsDir, { recursive: true });
   }
-  
+
   // Handle existing file
   if (fs.existsSync(scriptPath)) {
     console.log('⚠️ Helper script already exists at:', scriptPath);
-    
+
     const choice = await inquirer.prompt([
       {
         type: 'list',
@@ -684,23 +786,23 @@ async function createHelperScript(useConfigFile = false, config = null, template
       console.log(`📋 Created backup: ${backupPath}`);
     } // 'replace' option does nothing extra, just proceeds to overwrite
   }
-  
+
   // Extract coverage type names from config
   const coverageTypes = config?.coverage?.types?.map(t => t.name) || [];
-  
+
   const content = templateProcessor.generateCoverageScript(useConfigFile, coverageTypes);
-  
+
   fs.writeFileSync(scriptPath, content);
-  
+
   // Make the script executable
   try {
     fs.chmodSync(scriptPath, '755');
   } catch (error) {
     console.warn('⚠️ Could not make script executable');
   }
-  
+
   console.log(`✅ Created helper script: ${scriptPath}`);
-  
+
   // Update package.json with script reference
   updatePackageJson(config);
 }
@@ -711,16 +813,16 @@ async function createHelperScript(useConfigFile = false, config = null, template
 function updateGitIgnore() {
   const gitignorePath = path.join(process.cwd(), '.gitignore');
   let content = '';
-  
+
   if (fs.existsSync(gitignorePath)) {
     content = fs.readFileSync(gitignorePath, 'utf8');
-    
+
     // Add newline if needed
     if (content && !content.endsWith('\n')) {
       content += '\n';
     }
   }
-  
+
   // Check if entry is already there
   if (!content.includes('.env.github-coverage')) {
     content += '\n# GitHub Coverage Reporter\n.env.github-coverage\n';
@@ -736,29 +838,29 @@ function updateGitIgnore() {
  */
 function updatePackageJson(config = null) {
   const packageJsonPath = path.join(process.cwd(), 'package.json');
-  
+
   // Skip if package.json doesn't exist
   if (!fs.existsSync(packageJsonPath)) {
     console.log('ℹ️ package.json not found, skipping script addition');
     return;
   }
-  
+
   try {
     const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-    
+
     // Initialize scripts object if it doesn't exist
     if (!packageJson.scripts) {
       packageJson.scripts = {};
     }
-    
+
     // Add scripts
     let updated = false;
-    
+
     if (!packageJson.scripts['coverage-report']) {
       packageJson.scripts['coverage-report'] = 'node scripts/coverage-report.js --all';
       updated = true;
     }
-    
+
     // If we have config with coverage types, generate scripts for each type
     if (config && config.coverage && config.coverage.types) {
       config.coverage.types.forEach(type => {
@@ -774,13 +876,13 @@ function updatePackageJson(config = null) {
         packageJson.scripts['coverage-report:backend'] = 'node scripts/coverage-report.js --name=backend';
         updated = true;
       }
-      
+
       if (!packageJson.scripts['coverage-report:frontend']) {
         packageJson.scripts['coverage-report:frontend'] = 'node scripts/coverage-report.js --name=frontend';
         updated = true;
       }
     }
-    
+
     if (updated) {
       fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
       console.log('✅ Updated package.json with coverage-report scripts');
