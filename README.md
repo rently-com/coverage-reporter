@@ -19,7 +19,9 @@ A modular npm package for reporting code coverage to GitHub pull requests with s
 ## Installation
 
 ```bash
-npm install @rently-com/github-coverage-reporter
+npm install @rently-com/coverage-reporter
+or
+npm install https://github.com/rently-com/coverage-reporter/tree/main
 ```
 
 ## Quick Start
@@ -28,11 +30,7 @@ Initialize the GitHub Coverage Reporter in your project with an interactive setu
 
 ```bash
 # Using npx (recommended)
-npx github-coverage-init
-
-# Or after installation
-npm install github-coverage-reporter
-npx github-coverage-reporter init
+npx coverage-reporter-init
 ```
 
 ### 🎯 Smart Initialization
@@ -69,36 +67,36 @@ The module supports different coverage types through command-line parameters:
 
 ```bash
 # Specify coverage type (required)
-npx github-coverage-reporter --name=api
-npx github-coverage-reporter --name=web
-npx github-coverage-reporter --name=lambda
-npx github-coverage-reporter --name=services
+npx coverage-reporter --name=api
+npx coverage-reporter --name=web
+npx coverage-reporter --name=lambda
+npx coverage-reporter --name=services
 
 # Custom file path
-npx github-coverage-reporter --name=api --file=./custom/coverage-summary.json
+npx coverage-reporter --name=api --file=./custom/coverage-summary.json
 
 # Disable specific features
-npx github-coverage-reporter --name=web --no-comments
-npx github-coverage-reporter --name=api --no-status --no-s3
+npx coverage-reporter --name=web --no-comments
+npx coverage-reporter --name=api --no-status --no-s3
 
 # Show help
-npx github-coverage-reporter --help
+npx coverage-reporter --help
 ```
 
 **For projects with multiple coverage types**, run the command multiple times:
 
 ```bash
 # In CI/CD pipeline or script
-npx github-coverage-reporter --name=api
-npx github-coverage-reporter --name=web
-npx github-coverage-reporter --name=lambda
-npx github-coverage-reporter --name=services
+npx coverage-reporter --name=api
+npx coverage-reporter --name=web
+npx coverage-reporter --name=lambda
+npx coverage-reporter --name=services
 ```
 
 ### Programmatically
 
 ```javascript
-const GitHubCoverageReporter = require('@rently-com/github-coverage-reporter');
+const GitHubCoverageReporter = require('@rently-com/coverage-reporter');
 
 const reporter = new GitHubCoverageReporter({
   coverageType: 'api', // Specify the coverage type for this run
