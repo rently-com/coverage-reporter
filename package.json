@@ -1,11 +1,11 @@
 {
-  "name": "@rently-com/github-coverage-reporter",
+  "name": "@rently-com/coverage-reporter",
   "version": "1.0.0",
-  "description": "A GitHub coverage reporting tool that posts coverage status checks and PR comments",
+  "description": "A Test coverage reporting tool that posts coverage status checks and PR comments to GitHub",
   "main": "index.js",
   "bin": {
-    "github-coverage-reporter": "./bin/cli-run.js",
-    "github-coverage-init": "./bin/simple-init.js"
+    "coverage-reporter": "./bin/cli-run.js",
+    "coverage-reporter-init": "./bin/simple-init.js"
   },
   "scripts": {
     "test": "mocha 'test/**/*.test.js'",
@@ -29,7 +29,7 @@
     "pull-request",
     "status-checks"
   ],
-  "author": "Rently <tech@rently.com>",
+  "author": "Rently <jarvis.team@rently.com>",
   "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.0.0",
@@ -53,10 +53,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/rently-com/rently-billing.git"
+    "url": "git+https://github.com/rently-com/coverage-reporter.git"
   },
   "bugs": {
-    "url": "https://github.com/rently-com/rently-billing/issues"
+    "url": "https://github.com/rently-com/coverage-reporter/issues"
   },
-  "homepage": "https://github.com/rently-com/rently-billing#readme"
+  "homepage": "https://github.com/rently-com/coverage-reporter#readme"
 }
