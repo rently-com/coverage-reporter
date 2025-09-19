@@ -116,7 +116,7 @@ class GitHubCoverageReporter {
         };
       } else {
         // Single type (default behavior)
-        const coverageType = options.coverageType || this.options.coverageType;
+        const coverageType = options.coverageType || this.options.coverageType || options.coverageTypes?.[0];
         const currentCoverage = coverageData || this.parseCoverageFromFile(options);
         let previousCoverage = 0;
         let pr = null;
