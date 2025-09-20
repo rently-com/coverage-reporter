@@ -20,7 +20,14 @@ pipeline {
         
         stage('Coverage Report') {
             when {
-                expression { env.CHANGE_ID != null } // Only run on PRs
+                anyOf {
+                    branch startingWith('feature/')
+                    branch startingWith('bugfix/')
+                    branch startingWith('hotfix/')
+                    branch startingWith('release/')
+                    branch 'main'
+                    expression { env.CHANGE_ID != null } // Only run on PRs
+                }
             }
             steps {
                 sh 'npm run test:coverage'
@@ -29,19 +36,14 @@ pipeline {
             environment {
                 // GitHub credentials - configure these in Jenkins
                 GITHUB_ACCESS_TOKEN = credentials('github-token')
-                GITHUB_OWNER = '{{GITHUB_OWNER}}'  // Update with your organization
-                GITHUB_REPO = '{{GITHUB_REPO}}'  // Update with your repository name
                 GITHUB_SHA = "${env.GIT_COMMIT}"
                 GITHUB_PR_NUMBER = "${env.CHANGE_ID}"
                 GITHUB_CURR_BRANCH = "${env.CHANGE_BRANCH}"
-                GITHUB_TARGET_BRANCH = "${env.CHANGE_TARGET}"
                 // Add any additional environment variables your project needs:
-                // AWS_S3_BUCKET = credentials('aws-s3-bucket')
-                // FOLDER_NAME = credentials('folder-name')
-                // AWS_REGION = credentials('aws-region')
-                // AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
-                // AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
-                // FILE_NAME = 'coverage'
+                AWS_REGION = credentials('aws-region')
+                AWS_ACCESS_KEY_ID = credentials('aws-access-key-id')
+                AWS_SECRET_ACCESS_KEY = credentials('aws-secret-access-key')
+                AWS_S3_BUCKET = credentials('aws-s3-bucket')
             }
         }
     }

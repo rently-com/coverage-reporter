@@ -39,16 +39,11 @@ jobs:
         env:
           # GitHub environment variables - automatically provided by CI
           GITHUB_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_OWNER: ${{ github.repository_owner }}
-          GITHUB_REPO: ${{ github.event.repository.name }}
           GITHUB_SHA: ${{ github.sha }}
           GITHUB_PR_NUMBER: ${{ github.event.pull_request.number }}
           GITHUB_CURR_BRANCH: ${{ github.head_ref || github.ref_name }}
-          GITHUB_TARGET_BRANCH: ${{ github.base_ref || 'main' }}
           # Add any additional environment variables your project needs:
-          # AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
-          # FOLDER_NAME: ${{ secrets.FOLDER_NAME }}
-          # AWS_REGION: ${{ secrets.AWS_REGION }}
-          # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          # FILE_NAME: coverage
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
