@@ -186,8 +186,6 @@ When using the `.gcr.json` configuration file, you only need:
 | Variable | Description | Example |
 |----------|-------------|---------|
 | `GITHUB_ACCESS_TOKEN` | GitHub personal access token | `ghp_abc123...` |
-| `GITHUB_REPO` | Repository name | `rently-billing` |
-| `GITHUB_OWNER` | Repository owner | `rently-com` |
 | `GITHUB_CURR_BRANCH` | Current branch name | `feature/my-feature` |
 
 **Note:** For each coverage type you want to report, you MUST either:
