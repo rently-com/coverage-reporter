@@ -172,7 +172,12 @@ class GitHubCoverageReporter {
       try {
         const filePath = ConfigManager.getCoveragePath(coverageType, this.config);
         const keyPath = ConfigManager.getCoverageKeyPath(coverageType, this.config);
-        console.log(`Parsing ${coverageType} coverage from (config path): ${filePath}`);
+        console.log(`Parsing ${coverageType} coverage from file path: ${filePath}, key path: ${keyPath}`);
+
+        if (!keyPath) {
+          return CoverageParser.parseSingleFile(filePath);
+        }
+        
         return CoverageParser.parseSingleFile(filePath, keyPath);
       } catch (configError) {
         console.log(`No path found in config for ${coverageType}, trying environment variables...`);
