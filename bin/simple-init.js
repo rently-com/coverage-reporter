@@ -323,7 +323,7 @@ async function createJsonConfig() {
             type: 'input',
             name: 'keyPath',
             message: answers => `Key path to get the value from ${answers.path} file:`,
-            default: answers => `total.statements.pct`
+            default: 'total.statements.pct'
           },
           {
             type: 'input',
