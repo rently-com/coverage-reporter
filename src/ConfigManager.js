@@ -94,8 +94,8 @@ class ConfigManager {
    * @returns {number} - Maximum allowed coverage difference
    */
   static getMaxCoverageDiff(config) {
-    if (!config || !config.config || !config.config.maxCoverageDiff) {
-      return 1; // Default value if not specified
+    if (!config || !config.config || ([null, undefined].includes(config.config.maxCoverageDiff))) {
+      return 0; // Default value if not specified
     }
     
     return config.config.maxCoverageDiff;

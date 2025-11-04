@@ -55,7 +55,7 @@ class GitHubCoverageReporter {
         thresholds[type.name] = type.threshold;
       });
       coverageOptions.customThresholds = thresholds;
-      coverageOptions.maxDiff = coverageOptions.maxDiff || ConfigManager.getMaxCoverageDiff(this.config);
+      coverageOptions.maxDiff = ![null, undefined].includes(coverageOptions.maxDiff) ? coverageOptions.maxDiff : ConfigManager.getMaxCoverageDiff(this.config);
     }
 
     this.coverageReporter = new CoverageReporter(coverageOptions);

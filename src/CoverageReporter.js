@@ -7,7 +7,7 @@ class CoverageReporter {
       lambda: options.lambdaThreshold || 80,
       ...options.customThresholds
     };
-    this.maxDiff = options.maxDiff || 1;
+    this.maxDiff = [null, undefined].includes(options.maxDiff) ? 0 : options.maxDiff;
     this.coverageTypes = options.coverageTypes || ['backend', 'frontend'];
   }
 
