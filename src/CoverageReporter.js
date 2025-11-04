@@ -53,7 +53,7 @@ class CoverageReporter {
         }
         return (currentCoverage[type] || 0) < this.thresholds[type];
       })
-      .map(type => `⚠️ ${type.charAt(0).toUpperCase() + type.slice(1)} coverage is below the required threshold / max allowed change.`);
+      .map(type => `⚠️ ${type.charAt(0).toUpperCase() + type.slice(1)} coverage is below the required threshold / max allowed change of ${this.maxDiff}%.`);
 
     const warningText = warnings.length > 0 ? '\n\n' + warnings.join('\n') : '';
 
