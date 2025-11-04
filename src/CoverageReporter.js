@@ -24,21 +24,36 @@ class CoverageReporter {
       return curr > prev ? `+${diff}%` : `${diff}%`;
     };
 
-    const getStatusEmoji = (curr, threshold) => curr >= threshold ? '✅' : '❌';
+    const isCoverageDropWithinLimit = (curr, prev) => {
+      const diffCoverage = prev - curr;
+      if (diffCoverage < this.maxDiff) {
+      return true;
+      }
+      return false;
+    };
+
+    const getStatusEmoji = (success) => success ? '✅' : '❌';
 
     // Generate table rows for each coverage type
     const tableRows = coverageTypes.map(type => {
       const current = currentCoverage[type] || 0;
       const previous = previousCoverage[type] || 0;
       const threshold = this.thresholds[type] || 80;
-      
-      return `| ${type.charAt(0).toUpperCase() + type.slice(1)} | ${current}% | ${previous}% | ${getChangeEmoji(current, previous)} ${getChangeText(current, previous)} | ${threshold}% | ${getStatusEmoji(current, threshold)} |`;
+      const changeStatus = isCoverageDropWithinLimit(current, previous);
+      const overallStatus = current >= threshold && changeStatus;
+
+      return `| ${type.charAt(0).toUpperCase() + type.slice(1)} | ${current}% | ${previous}% | ${getChangeEmoji(current, previous)} ${getChangeText(current, previous)} | ${threshold}% | ${getStatusEmoji(overallStatus)} |`;
     }).join('\n');
 
     // Generate warnings for coverage types below threshold
     const warnings = coverageTypes
-      .filter(type => (currentCoverage[type] || 0) < this.thresholds[type])
-      .map(type => `⚠️ ${type.charAt(0).toUpperCase() + type.slice(1)} coverage is below the required threshold.`);
+      .filter(type => {
+        if (!isCoverageDropWithinLimit(currentCoverage[type], previousCoverage[type])) {
+          return true;
+        }
+        return (currentCoverage[type] || 0) < this.thresholds[type];
+      })
+      .map(type => `⚠️ ${type.charAt(0).toUpperCase() + type.slice(1)} coverage is below the required threshold / max allowed change.`);
 
     const warningText = warnings.length > 0 ? '\n\n' + warnings.join('\n') : '';
 
