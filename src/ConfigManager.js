@@ -49,6 +49,25 @@ class ConfigManager {
     
     return typeConfig.filePath;
   }
+
+  /**
+   * Get coverage key path for a specific type
+   * @param {string} type - Coverage type
+   * @param {Object} config - Loaded configuration
+   * @returns {string} - Key path for the coverage type
+   */
+  static getCoverageKeyPath(type, config) {
+    if (!config || !config.coverage || !config.coverage.types) {
+      throw new Error('Invalid configuration format: coverage types not found');
+    }
+    
+    const typeConfig = config.coverage.types.find(t => t.name === type);
+    if (!typeConfig) {
+      throw new Error(`Coverage type not found in configuration: ${type}`);
+    }
+
+    return typeConfig.keyPath;
+  }
   
   /**
    * Get threshold for a specific coverage type
@@ -75,8 +94,8 @@ class ConfigManager {
    * @returns {number} - Maximum allowed coverage difference
    */
   static getMaxCoverageDiff(config) {
-    if (!config || !config.config || !config.config.maxCoverageDiff) {
-      return 1; // Default value if not specified
+    if (!config || !config.config || ([null, undefined].includes(config.config.maxCoverageDiff))) {
+      return 0; // Default value if not specified
     }
     
     return config.config.maxCoverageDiff;

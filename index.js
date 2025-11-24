@@ -55,7 +55,7 @@ class GitHubCoverageReporter {
         thresholds[type.name] = type.threshold;
       });
       coverageOptions.customThresholds = thresholds;
-      coverageOptions.maxDiff = coverageOptions.maxDiff || ConfigManager.getMaxCoverageDiff(this.config);
+      coverageOptions.maxDiff = ![null, undefined].includes(coverageOptions.maxDiff) ? coverageOptions.maxDiff : ConfigManager.getMaxCoverageDiff(this.config);
     }
 
     this.coverageReporter = new CoverageReporter(coverageOptions);
@@ -171,8 +171,14 @@ class GitHubCoverageReporter {
     if (this.config) {
       try {
         const filePath = ConfigManager.getCoveragePath(coverageType, this.config);
-        console.log(`Parsing ${coverageType} coverage from (config path): ${filePath}`);
-        return CoverageParser.parseSingleFile(filePath);
+        const keyPath = ConfigManager.getCoverageKeyPath(coverageType, this.config);
+        console.log(`Parsing ${coverageType} coverage from file path: ${filePath}, key path: ${keyPath}`);
+
+        if (!keyPath) {
+          return CoverageParser.parseSingleFile(filePath);
+        }
+        
+        return CoverageParser.parseSingleFile(filePath, keyPath);
       } catch (configError) {
         console.log(`No path found in config for ${coverageType}, trying environment variables...`);
       }

@@ -321,6 +321,12 @@ async function createJsonConfig() {
           },
           {
             type: 'input',
+            name: 'keyPath',
+            message: answers => `Key path to get the value from ${answers.path} file:`,
+            default: 'total.statements.pct'
+          },
+          {
+            type: 'input',
             name: 'threshold',
             message: answers => `Coverage threshold for ${answers.name} (0-100):`,
             default: 80,
@@ -336,6 +342,7 @@ async function createJsonConfig() {
         types.push({
           name: typeAnswers.name.trim(),
           filePath: typeAnswers.path.trim(),
+          keyPath: typeAnswers.keyPath.trim(),
           threshold: parseInt(typeAnswers.threshold)
         });
         
