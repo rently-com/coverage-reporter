@@ -80,7 +80,7 @@ ${tableRows}${warningText}`;
     }
 
     const diffCoverage = previousCoverage - currentCoverage;
-    const pass = diffCoverage < this.maxDiff;
+    const pass = diffCoverage <= this.maxDiff;
 
     let description;
     if (currentCoverage === previousCoverage) {
