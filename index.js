@@ -171,12 +171,13 @@ class GitHubCoverageReporter {
     if (this.config) {
       try {
         const filePath = ConfigManager.getCoveragePath(coverageType, this.config);
-        const keyPath = ConfigManager.getCoverageKeyPath(coverageType, this.config);
-        console.log(`Parsing ${coverageType} coverage from file path: ${filePath}, key path: ${keyPath}`);
-
+        let keyPath = ConfigManager.getCoverageKeyPath(coverageType, this.config);
+        
         if (!keyPath) {
-          return CoverageParser.parseSingleFile(filePath);
+          keyPath = 'total.statements.pct';
         }
+        
+        console.log(`Parsing ${coverageType} coverage from file path: ${filePath}, key path: ${keyPath}`);
         
         return CoverageParser.parseSingleFile(filePath, keyPath);
       } catch (configError) {
