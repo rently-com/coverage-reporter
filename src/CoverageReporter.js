@@ -26,8 +26,8 @@ class CoverageReporter {
 
     const isCoverageDropWithinLimit = (curr, prev) => {
       const diffCoverage = prev - curr;
-      if (diffCoverage < this.maxDiff) {
-      return true;
+      if (diffCoverage <= this.maxDiff) {
+        return true;
       }
       return false;
     };
