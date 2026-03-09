@@ -28,7 +28,7 @@
   "author": "Rently <jarvis.team@rently.com>",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.0.0",
+    "@aws-sdk/client-s3": "^3.1004.0",
     "axios": "^1.0.0",
     "dotenv": "^16.0.0",
     "inquirer": "^8.2.7"
