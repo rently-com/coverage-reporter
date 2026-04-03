@@ -16,4 +16,3 @@ updates:
     schedule:
       interval: daily          # Check once per day; change to "weekly" if preferred
     open-pull-requests-limit: 5
-    ignore: []                  # Remove this or add rules to ignore other packages
