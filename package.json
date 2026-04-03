@@ -34,7 +34,7 @@
     "inquirer": "8.2.7"
   },
   "devDependencies": {
-    "@secretlint/secretlint-rule-aws": "11.2.4",
+    "@secretlint/secretlint-rule-aws": "11.5.0",
     "@secretlint/secretlint-rule-gcp": "11.2.4",
     "@secretlint/secretlint-rule-preset-recommend": "11.2.4",
     "chai": "4.3.0",
