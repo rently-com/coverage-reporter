@@ -1,0 +1,19 @@
+# Dependabot config for consumer repos of github:rently-com/coverage-reporter
+#
+# Drop this file into .github/dependabot.yml in each consumer repo.
+# Dependabot will open a PR automatically whenever a new semver tag is pushed
+# to rently-com/coverage-reporter.
+#
+# Consumer repos must reference the package using the #semver: specifier:
+#   "coverage-reporter": "github:rently-com/coverage-reporter#semver:^1"
+# This lets npm resolve the latest matching tag while still locking to a commit
+# hash in package-lock.json for reproducible `npm ci` installs.
+
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily          # Check once per day; change to "weekly" if preferred
+    open-pull-requests-limit: 5
+    ignore: []                  # Remove this or add rules to ignore other packages
