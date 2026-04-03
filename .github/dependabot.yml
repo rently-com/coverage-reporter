@@ -16,3 +16,7 @@ updates:
     schedule:
       interval: daily          # Check once per day; change to "weekly" if preferred
     open-pull-requests-limit: 5
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"                 # Group all package updates into a single PR
