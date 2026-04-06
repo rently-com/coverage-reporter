@@ -31,21 +31,27 @@
     "@aws-sdk/client-s3": "3.1023.0",
     "axios": "1.14.0",
     "dotenv": "17.4.0",
-    "inquirer": "13.3.2"
+    "inquirer": "9.3.8"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "3.3.5",
+    "@eslint/js": "9.39.4",
     "@secretlint/secretlint-rule-aws": "11.5.0",
     "@secretlint/secretlint-rule-gcp": "11.5.0",
     "@secretlint/secretlint-rule-preset-recommend": "11.4.1",
-    "chai": "6.2.2",
-    "eslint": "10.1.0",
-    "mocha": "11.7.5",
+    "chai": "4.5.0",
+    "eslint": "9.39.4",
+    "globals": "17.4.0",
+    "mocha": "11.3.0",
     "nyc": "18.0.0",
     "secretlint": "11.4.1",
     "sinon": "21.0.3"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=20.9.0"
+  },
+  "overrides": {
+    "serialize-javascript": "7.0.5"
   },
   "repository": {
     "type": "git",
