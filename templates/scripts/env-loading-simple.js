@@ -10,4 +10,5 @@ try {
   }
 } catch (error) {
   // Silently continue - environment variables may be provided by CI
+  console.warn('Could not load .env.github-coverage, proceeding without it.', error.message);
 }

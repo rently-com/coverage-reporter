@@ -144,7 +144,7 @@ async function main() {
           }
           // Skip .js config files as they're more complex to modify
         } catch (error) {
-          console.warn(`⚠️ Could not parse ${configPath}, skipping nyc config update`);
+          console.warn(`⚠️ Could not parse ${configPath}, skipping nyc config update`, error.message);
           continue;
         }
         break;
@@ -248,7 +248,7 @@ async function createJsonConfig() {
           existingConfig = null;
         }
       } catch (error) {
-        console.warn('⚠️ Could not parse existing .gcr.json, starting fresh');
+        console.warn('⚠️ Could not parse existing .gcr.json, starting fresh:', error.message);
         existingConfig = null;
       }
     }
@@ -405,6 +405,7 @@ async function createJsonConfig() {
             }
           } catch (error) {
             // Ignore error and use empty default
+            console.warn('⚠️ Error finding repo details in package.json:', error.message);
           }
           return '';
         }
@@ -439,6 +440,7 @@ async function createJsonConfig() {
             }
           } catch (error) {
             // Ignore error and use empty default
+            console.warn('⚠️ Error finding repo details in package.json:', error.message);
           }
           return '';
         }
@@ -687,6 +689,7 @@ async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
           }
         } catch (error) {
           // Use defaults if we can't parse package.json
+          console.warn('⚠️ Error finding repo details in package.json:', error.message);
         }
         
         const content = templateProcessor.generateJenkinsfile(nodeVersion, githubOwner, githubRepo);
@@ -713,6 +716,7 @@ async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
           }
         } catch (error) {
           // Use defaults if we can't parse package.json
+          console.warn('⚠️ Error finding repo details in package.json:', error.message);
         }
         
         const content = templateProcessor.generateJenkinsfile(nodeVersion, githubOwner, githubRepo);
@@ -742,6 +746,7 @@ async function createJenkinsFile(templateProcessor, nodeVersion = '16') {
     }
   } catch (error) {
     // Use defaults if we can't parse package.json
+    console.warn('⚠️ Error finding repo details in package.json:', error.message);
   }
   
   const content = templateProcessor.generateJenkinsfile(nodeVersion, githubOwner, githubRepo);
@@ -805,7 +810,7 @@ async function createHelperScript(useConfigFile = false, config = null, template
   try {
     fs.chmodSync(scriptPath, '755');
   } catch (error) {
-    console.warn('⚠️ Could not make script executable');
+    console.warn('⚠️ Could not make script executable:', error.message);
   }
   
   console.log(`✅ Created helper script: ${scriptPath}`);
