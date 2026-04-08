@@ -9,16 +9,14 @@ try {
     console.log('Loaded environment variables from .env.github-coverage');
   }
 } catch (error) {
-  // Silently continue - environment variables may be provided by CI
   console.warn('Could not load .env.github-coverage, proceeding without it.', error.message);
 }
 
 // Load the configuration file if it exists
-let config;
 try {
     // Load configuration from .gcr.json if it exists
   const ConfigManager = require('{{PACKAGE_NAME}}/src/ConfigManager');
-  config = ConfigManager.loadConfig(); // eslint-disable-line no-unused-vars
+  ConfigManager.loadConfig();
   console.log('Loaded configuration from .gcr.json');
 } catch (error) {
   console.warn(`Warning: ${error.message}`);
