@@ -181,7 +181,7 @@ class GitHubCoverageReporter {
         
         return CoverageParser.parseSingleFile(filePath, keyPath);
       } catch (configError) {
-        console.log(`No path found in config for ${coverageType}, trying environment variables...`);
+        console.log(`No path found in config for ${coverageType}, trying environment variables...`, configError.message);
       }
     }
     

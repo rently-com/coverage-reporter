@@ -20,7 +20,7 @@ class TemplateProcessor {
       const packageContent = fs.readFileSync(packagePath, 'utf8');
       return JSON.parse(packageContent);
     } catch (error) {
-      console.warn('Warning: Could not load package.json, using fallback values');
+      console.warn('Warning: Could not load package.json, using fallback values.', error.message);
       return { name: 'github-coverage-reporter' };
     }
   }

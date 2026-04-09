@@ -1,6 +1,6 @@
 {
   "name": "@rently-com/coverage-reporter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A Test coverage reporting tool that posts coverage status checks and PR comments to GitHub",
   "main": "index.js",
   "bin": {
@@ -28,24 +28,30 @@
   "author": "Rently <jarvis.team@rently.com>",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-s3": "3.864.0",
-    "axios": "1.11.0",
-    "dotenv": "16.6.1",
-    "inquirer": "8.2.7"
+    "@aws-sdk/client-s3": "3.1023.0",
+    "axios": "1.14.0",
+    "dotenv": "17.4.0",
+    "inquirer": "9.3.8"
   },
   "devDependencies": {
-    "@secretlint/secretlint-rule-aws": "11.2.4",
-    "@secretlint/secretlint-rule-gcp": "11.2.4",
-    "@secretlint/secretlint-rule-preset-recommend": "11.2.4",
+    "@eslint/eslintrc": "3.3.5",
+    "@eslint/js": "9.39.4",
+    "@secretlint/secretlint-rule-aws": "11.5.0",
+    "@secretlint/secretlint-rule-gcp": "11.5.0",
+    "@secretlint/secretlint-rule-preset-recommend": "11.4.1",
     "chai": "4.5.0",
-    "eslint": "8.57.1",
-    "mocha": "10.8.2",
-    "nyc": "15.1.0",
-    "secretlint": "11.2.4",
-    "sinon": "15.2.0"
+    "eslint": "9.39.4",
+    "globals": "17.4.0",
+    "mocha": "11.3.0",
+    "nyc": "18.0.0",
+    "secretlint": "11.4.1",
+    "sinon": "21.0.3"
   },
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=20.9.0"
+  },
+  "overrides": {
+    "serialize-javascript": "7.0.5"
   },
   "repository": {
     "type": "git",

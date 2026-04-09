@@ -18,5 +18,6 @@ module.exports = {
     'no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     'prefer-const': 'error',
     'no-var': 'error'
-  }
+  },
+  ignores: ['dist/', 'coverage/', 'node_modules/', 'templates/', '.nyc_output/']
 };

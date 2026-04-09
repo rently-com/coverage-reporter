@@ -32,6 +32,7 @@ describe('Bin Files Execution Coverage', function() {
       });
     } catch (e) {
       // inquirer might not be available in test environment
+      console.log('Inquirer not available, skipping prompt stubbing.', e.message);
     }
   });
 

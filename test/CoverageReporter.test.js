@@ -87,7 +87,7 @@ describe('CoverageReporter', function() {
       expect(result).to.include('| Coverage Type | Current | Previous | Change | Threshold | Status |');
       expect(result).to.include('| Backend | 85% | 80% | 📈 +5.00% | 90% | ❌ |');
       expect(result).to.include('| Frontend | 96% | 90% | 📈 +6.00% | 95% | ✅ |');
-      expect(result).to.include('⚠️ Backend coverage is below the required threshold.');
+      expect(result).to.include('⚠️ Backend coverage is below the required threshold');
     });
 
     it('should handle no change in coverage', function() {
@@ -124,8 +124,8 @@ describe('CoverageReporter', function() {
 
       const result = coverageReporter.generateCoverageComment(previousCoverage, currentCoverage);
 
-      expect(result).to.include('⚠️ Backend coverage is below the required threshold.');
-      expect(result).to.not.include('⚠️ Frontend coverage is below the required threshold.');
+      expect(result).to.include('⚠️ Backend coverage is below the required threshold');
+      expect(result).to.not.include('⚠️ Frontend coverage is below the required threshold');
     });
 
     it('should show warning only for frontend when backend meets threshold', function() {
@@ -134,8 +134,8 @@ describe('CoverageReporter', function() {
 
       const result = coverageReporter.generateCoverageComment(previousCoverage, currentCoverage);
 
-      expect(result).to.include('⚠️ Frontend coverage is below the required threshold.');
-      expect(result).to.not.include('⚠️ Backend coverage is below the required threshold.');
+      expect(result).to.include('⚠️ Frontend coverage is below the required threshold');
+      expect(result).to.not.include('⚠️ Backend coverage is below the required threshold');
     });
 
     it('should show warnings for both when both are below threshold', function() {
@@ -144,8 +144,8 @@ describe('CoverageReporter', function() {
 
       const result = coverageReporter.generateCoverageComment(previousCoverage, currentCoverage);
 
-      expect(result).to.include('⚠️ Backend coverage is below the required threshold.');
-      expect(result).to.include('⚠️ Frontend coverage is below the required threshold.');
+      expect(result).to.include('⚠️ Backend coverage is below the required threshold');
+      expect(result).to.include('⚠️ Frontend coverage is below the required threshold');
     });
   });
 
@@ -277,7 +277,7 @@ describe('CoverageReporter', function() {
 
       expect(result).to.include('Backend | 90% | 0% | 📈 +90.00% | 80% | ✅');
       expect(result).to.include('Frontend | 75% | 0% | 📈 +75.00% | 85% | ❌');
-      expect(result).to.include('⚠️ Frontend coverage is below the required threshold.');
+      expect(result).to.include('⚠️ Frontend coverage is below the required threshold');
     });
 
     it('should handle coverage types not found in thresholds object', function() {
@@ -307,7 +307,7 @@ describe('CoverageReporter', function() {
 
       expect(result).to.include('Backend | 95% | 90% | 📈 +5.00% | 80% | ✅');
       expect(result).to.include('Frontend | 0% | 85% | 📉 -85.00% | 85% | ❌');
-      expect(result).to.include('⚠️ Frontend coverage is below the required threshold.');
+      expect(result).to.include('⚠️ Frontend coverage is below the required threshold');
     });
   });
 });

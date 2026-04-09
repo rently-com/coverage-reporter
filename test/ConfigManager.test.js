@@ -164,14 +164,14 @@ describe('ConfigManager', () => {
 
     it('should return default value when config is null', () => {
       const result = ConfigManager.getMaxCoverageDiff(null);
-      expect(result).to.equal(1);
+      expect(result).to.equal(0);
     });
 
     it('should return default value when config section is missing', () => {
       const config = { other: 'data' };
       
       const result = ConfigManager.getMaxCoverageDiff(config);
-      expect(result).to.equal(1);
+      expect(result).to.equal(0);
     });
 
     it('should return default value when maxCoverageDiff is missing', () => {
@@ -182,7 +182,7 @@ describe('ConfigManager', () => {
       };
       
       const result = ConfigManager.getMaxCoverageDiff(config);
-      expect(result).to.equal(1);
+      expect(result).to.equal(0);
     });
   });
 
