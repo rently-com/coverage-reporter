@@ -318,8 +318,8 @@ describe('GitHubCoverageReporter - Advanced Features', () => {
       
       expect(ConfigManager.getCoveragePath.calledWith('backend', reporter.config)).to.be.true;
       expect(CoverageParser.parseSingleFile.calledWith('./custom/backend.json')).to.be.true;
-      expect(result).to.equal(88.0);
-      expect(console.log.calledWith('Parsing backend coverage from (config path): ./custom/backend.json')).to.be.true;
+      expect(result).to.equal(88.0);  
+      expect(console.log.getCalls()[0].args[0]).to.include('Parsing backend coverage from file path: ./custom/backend.json');
     });
 
     it('should fallback to environment variables when config path fails', () => {

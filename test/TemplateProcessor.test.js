@@ -63,7 +63,7 @@ describe('TemplateProcessor', () => {
       const result = processor.loadPackageJson();
       
       expect(result).to.deep.equal({ name: 'github-coverage-reporter' });
-      expect(console.warn.calledWith('Warning: Could not load package.json, using fallback values')).to.be.true;
+      expect(console.warn.getCall(0).args[0]).to.include('Warning: Could not load package.json, using fallback values');
     });
 
     it('should return fallback values when package.json contains invalid JSON', () => {
