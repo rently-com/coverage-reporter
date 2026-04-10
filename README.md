@@ -18,11 +18,48 @@ A modular npm package for reporting code coverage to GitHub pull requests with s
 
 ## Installation
 
+This package is distributed via GitHub and versioned using semver git tags (e.g. `v1.0.1`). It is not published to the npm registry.
+
+### In consumer repos
+
+Add the dependency to `package.json` using the `#semver:` specifier so npm resolves against git tags rather than a branch:
+
 ```bash
-npm install @rently-com/coverage-reporter
-or
-npm install https://github.com/rently-com/coverage-reporter/tree/main
+npm install github:rently-com/coverage-reporter#semver:^1
 ```
+
+Or add it manually in `package.json`:
+
+```json
+"dependencies": {
+  "coverage-reporter": "github:rently-com/coverage-reporter#semver:^1"
+}
+```
+
+Run `npm install` once to generate/update `package-lock.json`, then commit both files. After that, `npm ci` will install the pinned version reproducibly.
+
+### Keeping the package up to date in CI
+
+Because `npm ci` always installs from the frozen commit SHA in `package-lock.json`, add the following refresh step **before** `npm ci` in each consumer repo's CI pipeline. This re-resolves the `main` branch and updates only that lock file entry without touching other packages:
+
+```bash
+npm install --package-lock-only github:rently-com/coverage-reporter#main
+npm ci
+```
+
+Or wrap it in a convenience script in `package.json`:
+
+```json
+"scripts": {
+  "ci": "npm install --package-lock-only github:rently-com/coverage-reporter#main && npm ci"
+}
+```
+
+Then run `npm run ci` in your pipeline instead of `npm ci`.
+
+### Auto-updates via Dependabot (alternative)
+
+Consumer repos can also use Dependabot to receive automated PRs whenever a new version tag is published. Copy `.github/dependabot.yml` from this repo into the consumer repo's `.github/` directory. Dependabot will open a single grouped PR for all dependency updates (including this package) on the configured schedule.
 
 ## Quick Start
 
@@ -279,6 +316,26 @@ The module generates a coverage report like this:
 ```
 
 ## Development
+
+### Releases & Versioning
+
+This package uses **semver git tags** for versioning. Every merge to `main` automatically:
+
+1. Bumps the patch version in `package.json` (e.g. `v1.0.4` → `v1.0.5`)
+2. Commits the version bump with `[skip ci]`
+3. Creates an annotated versioned tag (e.g. `v1.0.5`)
+4. Moves the `latest` tag to the new commit
+
+This is handled by the `.github/workflows/release.yml` GitHub Actions workflow — **no manual tagging is needed**.
+
+To publish a breaking change or a minor version bump, update the version manually before merging:
+
+```bash
+npm version minor   # e.g. v1.0.5 → v1.1.0
+npm version major   # e.g. v1.1.0 → v2.0.0
+```
+
+The workflow will detect the existing tag and bump from there on the next auto-release cycle.
 
 ### Security
 
