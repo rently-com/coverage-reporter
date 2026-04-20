@@ -28,24 +28,24 @@
   "author": "Rently <jarvis.team@rently.com>",
   "license": "MIT",
   "dependencies": {
-    "@aws-sdk/client-s3": "3.1028.0",
-    "axios": "1.15.0",
-    "dotenv": "17.4.1",
-    "inquirer": "12.11.1"
+    "@aws-sdk/client-s3": "3.1032.0",
+    "axios": "1.15.1",
+    "dotenv": "17.4.2",
+    "inquirer": "13.4.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "3.3.5",
-    "@eslint/js": "9.39.4",
-    "@secretlint/secretlint-rule-aws": "11.6.0",
-    "@secretlint/secretlint-rule-gcp": "11.6.0",
-    "@secretlint/secretlint-rule-preset-recommend": "11.6.0",
-    "chai": "4.5.0",
-    "eslint": "9.39.4",
-    "globals": "17.4.0",
+    "@eslint/js": "10.0.1",
+    "@secretlint/secretlint-rule-aws": "12.1.0",
+    "@secretlint/secretlint-rule-gcp": "12.1.0",
+    "@secretlint/secretlint-rule-preset-recommend": "12.1.0",
+    "chai": "6.2.2",
+    "eslint": "10.2.1",
+    "globals": "17.5.0",
     "mocha": "11.7.5",
     "nyc": "18.0.0",
-    "secretlint": "11.6.0",
-    "sinon": "20.0.0"
+    "secretlint": "12.1.0",
+    "sinon": "21.1.2"
   },
   "engines": {
     "node": ">=20.9.0"
